@@ -1,12 +1,12 @@
-# 🌐 Navegador Panorâmico 360° — Protótipo WebGL (Vortex)
+# Navegador Panorâmico 360° — Protótipo WebGL (Vortex)
 
-> **🎮 Teste a versão online (WebGL):** [Link itch.io](https://luisgustavobl.itch.io/projeto-vortex360)
+>  **Teste a versão online (WebGL):** [Link itch.io](https://luisgustavobl.itch.io/projeto-vortex360)
 
 Projeto desenvolvido como protótipo de navegação panorâmica interativa em 360° utilizando imagens equirretangulares e shaders no ecossistema Unity 6 (URP).
 
 ---
 
-## 🚀 Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
 - [X] **Visualização Panorâmica 360°:** Projeção esférica via Shader `Skybox/Panoramic`.
 - [X] **Navegação Multimodal:** Alternância de panoramas via teclado (WASD / Setas) e botões UI na tela.
@@ -15,11 +15,11 @@ Projeto desenvolvido como protótipo de navegação panorâmica interativa em 36
 
 ---
 
-## 🤖 Diário de Bordo da IA (AI Logbook)
+## AI Logbook
 
 Este projeto utilizou IA Generativa como parceira de desenvolvimento (*Pair Programming*) durante todo o processo de arquitetura, codificação em C# e resolução de gargalos de exportação.
 
-### 📅 Histórico de Desenvolvimento e Desafios
+### Histórico de Desenvolvimento e Desafios
 
 #### **Fase 1: Rotação 360° e Input System**
 
@@ -47,7 +47,7 @@ Este projeto utilizou IA Generativa como parceira de desenvolvimento (*Pair Prog
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Engine:** Unity 6 (URP - Universal Render Pipeline)
 - **Linguagem:** C#
