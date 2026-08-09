@@ -1,0 +1,23 @@
+# Cache e arquivos temporarios da Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+
+# Arquivos de IDE e Solution
+.vs/
+.idea/
+.vsconfig
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+
+# Arquivos temporarios do sistema
+.DS_Store
+Thumbs.db
