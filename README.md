@@ -21,29 +21,53 @@ Este projeto utilizou IA Generativa como parceira de desenvolvimento (*Pair Prog
 
 ### Histórico de Desenvolvimento e Desafios
 
-#### **Fase 1: Rotação 360° e Input System**
+#### **Etapa Inicial: Prototipação**
+
+**Fase 1: Rotação 360° e Input System**
 
 - **Ação:** Implementação da câmera rotacional (`CameraRotator.cs`).
 - **Desafio:** Erros de leitura de input do mouse no pipeline URP.
 - **Solução com IA:** Ajuste nas preferências de entrada da Unity (*Active Input Handling*) para dar suporte ao código de rotação.
 
-#### **Fase 2: Gerenciamento da Rota e UI de Navegação**
+**Fase 2: Gerenciamento da Rota e UI de Navegação**
 
 - **Ação:** Criação do script `StreetViewManager.cs` para percorrer a lista de panoramas.
 - **Desafio:** Fotos desordenadas/duplicadas ao vincular os botões 2D aos eventos `OnClick`.
 - **Solução com IA:** Curadoria da lista de imagens e refatoração dos métodos de avanço e recuo.
 
-#### **Fase 3: Barreira de Limite de Mapa e Efeitos de Canvas**
+**Fase 3: Barreira de Limite de Mapa e Efeitos de Canvas**
 
 - **Ação:** Criação de feedback de "barreira de mapa" quando o usuário atinge o início ou fim da rota.
 - **Desafio:** A imagem do `FlashOverlay` não aparecia na tela durante o acionamento da Coroutine.
 - **Solução com IA:** Ajuste na ordem dos elementos no Canvas, troca do sprite para `UISprite` e correção do Alpha no canal de cor do componente `Image`.
 
-#### **Fase 4: Otimização do Pipeline para WebGL**
+**Fase 4: Otimização do Pipeline para WebGL**
 
 - **Ação:** Exportação da build para a plataforma Web.
 - **Desafio:** A Build WebGL inicial gerou um arquivo `.data` de quase 300 MB por conta da conversão dos JPGs em Cubemaps (6 faces por imagem).
 - **Solução com IA:** Substituição do Shader para `Skybox/Panoramic` (2D Equirretangular), aplicação do *Override* para WebGL e ajuste da compressão, reduzindo o arquivo para ~70 MB e viabilizando a hospedagem no itch.io.
+
+#### **Etapa 1: Fundamentação**
+
+- Adicionar uma tela inicial antes de entrar no jogo.
+- Ao chegar na panorama em frente ao castelinho (Street View 15), o jogador deverá ser oferecido a opção de adentrar o castelo. No entanto, o botão de entrar só estará disponível se o jogador estiver olhando na direção do castelo, portanto deverá ser baseado no posicionamento e ângulo da câmera.
+- Ao clicar no botão e entrar no castelinho, o jogador entra em uma nova “fase”, portanto novos panoramas totalmente diferentes da área externa serão utilizados.
+- Para sair do castelo, o mesmo esquema que foi utilizado para entrar deverá ser implantado, dessa vez o jogador viraria a câmera para trás e lá encontraria o botão.
+
+#### **Etapa 2: Gamificação**
+
+- Para desbloquear o acesso ao castelo, o jogador precisa encontrar e coletar 5 fragmentos de um diário, tais fragmentos estariam espalhados pelas outras panoramas. Para coletar o fragmento deverá ser utilizado um sistema parecido com o de entrar no castelo, e assim seria o fluxo: Jogador vasculha o ambiente de tal panorama > jogador vê o fragmento > jogador clica no fragmento para coletar.
+- Ao coletar um fragmento, deverá aparecer um aviso informando quantos fragmentos foram coletados e ao coletar todos os 5, uma imagem apareceria na tela.
+- No canto superior da tela, uma espécie de “progresso” deverá informar a todo o momento quantos fragmentos foram coletados e quantos faltam. Exemplo: “ 3/5 ” . No entanto, tal ícone apenas apareceria após coletar o primeiro.
+- Antes de coletar todos os fragmentos, o botão de entrar no castelo deverá ficar “cinza” e ao tentar clicar nele um texto “Você não pode entrar aqui ainda” aparecerá.
+- Ao coletar todos os fragmentos, o botão da entrada do castelo será desbloqueado e então o jogador poderá entrar.
+- Após entrar no castelo pela primeira vez, o ícone de fragmentos restantes deverá sumir.
+
+#### **Etapa 3: Polimento**
+
+- Adicionar efeitos de transição entre panoramas, como fade in/fade out.
+- Adicionar efeitos sonoros ao realizar ações. Ex.: Clica em botão, coletar fragmento.
+- Adicionar arte aos botões.
 
 ---
 
