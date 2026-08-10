@@ -38,16 +38,63 @@ public class JournalManager : MonoBehaviour
 
     void Start()
     {
-        if (progressUI != null) progressUI.SetActive(false);
-        if (painelDiarioCompleto != null) painelDiarioCompleto.SetActive(false);
+        // Carrega o número de fragmentos já salvos
+        fragmentosColetados = PlayerPrefs.GetInt("FragmentosColetados", 0);
+
         if (blockedTextWarning != null) blockedTextWarning.gameObject.SetActive(false);
+        if (painelDiarioCompleto != null) painelDiarioCompleto.SetActive(false);
+
+        // Se já coletou pelo menos um fragmento, mantém a UI visível ao retornar à cena
+        if (progressUI != null)
+        {
+            progressUI.SetActive(fragmentosColetados > 0);
+        }
 
         AtualizarUI();
     }
 
+    /// <summary>
+    /// Verifica se um fragmento específico já foi coletado e salvo previamente
+    /// </summary>
+    public bool FragmentoJaColetado(int index)
+    {
+        return PlayerPrefs.GetInt($"Fragmento_{index}", 0) == 1;
+    }
+
+    /// <summary>
+    /// Coleta um fragmento por índice garantindo persistência do progresso
+    /// </summary>
+    public void ColetarFragmento(int index)
+    {
+        if (FragmentoJaColetado(index)) return;
+
+        PlayerPrefs.SetInt($"Fragmento_{index}", 1);
+
+        fragmentosColetados++;
+        PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
+        PlayerPrefs.Save();
+
+        if (progressUI != null && !progressUI.activeSelf)
+        {
+            progressUI.SetActive(true);
+        }
+
+        AtualizarUI();
+
+        if (fragmentosColetados >= totalFragmentos)
+        {
+            CompletarDiario();
+        }
+    }
+
+    /// <summary>
+    /// Método antigo sem parâmetro mantido para garantir compatibilidade
+    /// </summary>
     public void ColetarFragmento()
     {
         fragmentosColetados++;
+        PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
+        PlayerPrefs.Save();
 
         if (progressUI != null && !progressUI.activeSelf)
         {
@@ -105,5 +152,18 @@ public class JournalManager : MonoBehaviour
     public void OcultarProgressoEntradaCastelo()
     {
         if (progressUI != null) progressUI.SetActive(false);
+    }
+
+    /// <summary>
+    /// Limpa os dados de coleta ao iniciar um Novo Jogo no Menu
+    /// </summary>
+    public static void ResetarProgressoColeta()
+    {
+        PlayerPrefs.DeleteKey("FragmentosColetados");
+        for (int i = 0; i < 10; i++)
+        {
+            PlayerPrefs.DeleteKey($"Fragmento_{i}");
+        }
+        PlayerPrefs.Save();
     }
 }

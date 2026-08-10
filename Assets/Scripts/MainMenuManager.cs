@@ -22,6 +22,9 @@ public class MainMenuManager : MonoBehaviour
             PlayerPrefs.Save();
         }
 
+        // Reseta os fragmentos coletados para que um novo jogo comece com o diário zerado
+        JournalManager.ResetarProgressoColeta();
+
         if (!string.IsNullOrEmpty(nomeCenaJogo))
         {
             SceneManager.LoadScene(nomeCenaJogo);

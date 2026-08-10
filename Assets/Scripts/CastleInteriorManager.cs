@@ -1,5 +1,5 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class CastleInteriorManager : MonoBehaviour
@@ -20,25 +20,37 @@ public class CastleInteriorManager : MonoBehaviour
     [Tooltip("Ângulo Y máximo para enxergar a saída do castelo")]
     public float anguloMaximoSaida = 210f;
 
-
     [Header("Botão de Acordar")]
     public GameObject wakeUpButton;
 
-    [Header("Objeto Ema Dormindo")]
+    [Header("Objetos da Ema")]
     public GameObject sleepingEma;
-
-    [Header("Objeto Ema Acordada")]
     public GameObject awokenEma;
+
+    [Header("Configuração de Acordar & Delays")]
+    [Tooltip("Tempo em segundos de espera após o clique até a Ema acordar")]
+    public float delayParaAcordar = 1.0f;
+    [Tooltip("Tempo em segundos de espera após a Ema acordar até exibir a tela de vitória")]
+    public float delayPainelVitoria = 2.0f;
+    private bool emaJaAcordou = false;
+
+    [Header("Efeito Sonoro (Áudio de Acordar)")]
+    public AudioSource audioSource;
+    public AudioClip somAcordar;
 
     [Header("Ângulo da Moema")]
     [Tooltip("Ângulo Y mínimo para enxergar a Moema")]
-    public float anguloMinimoEma = 150f;
+    public float anguloMinimoEma = 60f;
     [Tooltip("Ângulo Y máximo para enxergar a Moema")]
-    public float anguloMaximoEma = 210f;
+    public float anguloMaximoEma = 100f;
 
+    [Header("Telas e Botões de Fim de Jogo")]
+    public GameObject gameWonPanel;             // Painel Pop-up de Vitória
+    public GameObject inGameReturnToMenuButton; // Botão fixo na tela ativado após explorar
 
-    [Header("Cena Externa")]
+    [Header("Nomes das Cenas")]
     public string nomeCenaExterna = "SampleScene";
+    public string nomeCenaMenu = "MenuScene";
 
     void Start()
     {
@@ -55,11 +67,20 @@ public class CastleInteriorManager : MonoBehaviour
 
         if (exitCastleButton != null) exitCastleButton.SetActive(false);
         if (wakeUpButton != null) wakeUpButton.SetActive(false);
+        if (gameWonPanel != null) gameWonPanel.SetActive(false);
+        if (inGameReturnToMenuButton != null) inGameReturnToMenuButton.SetActive(false);
+
+        // Garante o estado inicial das Emas
+        if (sleepingEma != null) sleepingEma.SetActive(true);
+        if (awokenEma != null) awokenEma.SetActive(false);
 
         if (cameraTransform == null && Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
         }
+
+        // Caso o AudioSource não tenha sido atribuído manualmente, tenta pegar do objeto
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -73,31 +94,30 @@ public class CastleInteriorManager : MonoBehaviour
         if (exitCastleButton == null || cameraTransform == null) return;
 
         float anguloY = cameraTransform.eulerAngles.y;
-
-        // Normaliza qualquer valor negativo ou maior que 360° para a faixa [0, 360)
         anguloY = NormalizarAngulo(anguloY);
 
-        // Verifica se a câmera está virada para a porta de saída
         bool olhandoParaSaida = ChecarAnguloNoIntervalo(anguloY, anguloMinimoSaida, anguloMaximoSaida);
         exitCastleButton.SetActive(olhandoParaSaida);
     }
+
     private void VerificarEmaDormindo()
     {
         if (wakeUpButton == null || cameraTransform == null) return;
 
-        float anguloY = cameraTransform.eulerAngles.y;
+        // Se a Ema já acordou, não exibe mais o botão de acordar
+        if (emaJaAcordou)
+        {
+            if (wakeUpButton.activeSelf) wakeUpButton.SetActive(false);
+            return;
+        }
 
-        // Normaliza qualquer valor negativo ou maior que 360° para a faixa [0, 360)
+        float anguloY = cameraTransform.eulerAngles.y;
         anguloY = NormalizarAngulo(anguloY);
 
-        // Verifica se a câmera está virada para a porta de saída
         bool olhandoParaEma = ChecarAnguloNoIntervalo(anguloY, anguloMinimoEma, anguloMaximoEma);
         wakeUpButton.SetActive(olhandoParaEma);
     }
 
-    /// <summary>
-    /// Garante que o ângulo fique estritamente entre 0° e 360° mesmo com valores negativos
-    /// </summary>
     private float NormalizarAngulo(float angulo)
     {
         while (angulo < 0f) angulo += 360f;
@@ -111,9 +131,6 @@ public class CastleInteriorManager : MonoBehaviour
         else return angulo >= min || angulo <= max;
     }
 
-    /// <summary>
-    /// Retorna para a cena da área externa. Vincular ao OnClick do ExitCastleButton.
-    /// </summary>
     public void SairDoCastelo()
     {
         if (!string.IsNullOrEmpty(nomeCenaExterna))
@@ -121,11 +138,73 @@ public class CastleInteriorManager : MonoBehaviour
             SceneManager.LoadScene(nomeCenaExterna);
         }
     }
+
+    /// <summary>
+    /// Vincular ao OnClick() do WakeUpButton na Unity.
+    /// </summary>
     public void AcordarEma()
     {
-        // Revelar Ema Acordada
-        sleepingEma.SetActive(false);
+        if (!emaJaAcordou)
+        {
+            StartCoroutine(RotinaAcordarEmaComDelay());
+        }
+    }
 
-        awokenEma.SetActive(true);
+    private IEnumerator RotinaAcordarEmaComDelay()
+    {
+        // Esconde o botão imediatamente
+        if (wakeUpButton != null) wakeUpButton.SetActive(false);
+
+        // Delay 1: Espera para acordar
+        yield return new WaitForSeconds(delayParaAcordar);
+
+        // Troca de sprites
+        if (sleepingEma != null) sleepingEma.SetActive(false);
+        if (awokenEma != null) awokenEma.SetActive(true);
+
+        // Toca o efeito sonoro de acordar
+        if (audioSource != null && somAcordar != null)
+        {
+            audioSource.PlayOneShot(somAcordar);
+        }
+
+        emaJaAcordou = true;
+
+        // Delay 2: Espera para abrir o painel de vitória
+        yield return new WaitForSeconds(delayPainelVitoria);
+
+        if (gameWonPanel != null)
+        {
+            gameWonPanel.SetActive(true);
+        }
+    }
+
+    /// <summary>
+    /// Vincular ao OnClick() do ReturnToMenuButton (no painel de vitória ou na HUD).
+    /// </summary>
+    public void VoltarAoMenuPrincipal()
+    {
+        if (!string.IsNullOrEmpty(nomeCenaMenu))
+        {
+            SceneManager.LoadScene(nomeCenaMenu);
+        }
+    }
+
+    /// <summary>
+    /// Vincular ao OnClick() do ReturnToGameButton (no GameWonPanel).
+    /// Permite ao jogador continuar navegando no panorama interno.
+    /// </summary>
+    public void ContinuarExplorando()
+    {
+        if (gameWonPanel != null)
+        {
+            gameWonPanel.SetActive(false);
+        }
+
+        // Ativa o botão fixo na tela para retornar ao menu quando o jogador desejar
+        if (inGameReturnToMenuButton != null)
+        {
+            inGameReturnToMenuButton.SetActive(true);
+        }
     }
 }
