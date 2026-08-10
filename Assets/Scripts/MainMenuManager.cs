@@ -15,6 +15,13 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     public void IniciarJogo()
     {
+        // Reseta o panorama salvo para garantir que o jogador comece do inicio (panorama 0)
+        if (PlayerPrefs.HasKey("UltimoPanoramaIndex"))
+        {
+            PlayerPrefs.DeleteKey("UltimoPanoramaIndex");
+            PlayerPrefs.Save();
+        }
+
         if (!string.IsNullOrEmpty(nomeCenaJogo))
         {
             SceneManager.LoadScene(nomeCenaJogo);
@@ -51,7 +58,7 @@ public class MainMenuManager : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-            Application.Quit();
+        Application.Quit();
 #endif
     }
 }

@@ -6,6 +6,13 @@ public class CameraRotator : MonoBehaviour
     private float rotX = 0.0f;
     private float rotY = 0.0f;
 
+    [Header("Configuração de Ângulo Inicial")]
+    [Tooltip("Marque se deseja definir um ângulo Y específico ao carregar a cena")]
+    public bool usarAnguloInicial = true;
+    [Tooltip("Ângulo Y inicial para onde a câmera estará apontada no Start")]
+    public float anguloXInicial = 0.0f;
+    public float anguloYInicial = 0.0f;
+
     [Header("Configuração de Zoom")]
     public Camera cam;
     public float minFov = 30f;
@@ -15,6 +22,20 @@ public class CameraRotator : MonoBehaviour
     void Start()
     {
         if (cam == null) cam = Camera.main;
+
+        // Configuração do ângulo inicial mantendo a rotação X atual da câmera
+        if (usarAnguloInicial)
+        {
+            rotX = anguloXInicial;
+            rotY = anguloYInicial;
+            transform.rotation = Quaternion.Euler(rotX, rotY, 0.0f);
+        }
+        else
+        {
+            Vector3 euler = transform.eulerAngles;
+            rotX = euler.x;
+            rotY = euler.y;
+        }
     }
 
     void Update()
