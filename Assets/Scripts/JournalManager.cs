@@ -17,6 +17,14 @@ public class JournalManager : MonoBehaviour
     public GameObject painelDiarioCompleto;
     public TextMeshProUGUI blockedTextWarning; // Antigo TextoAvisoBloqueio
 
+    [Header("Efeitos Sonoros dos Fragmentos")]
+    public AudioSource audioSource;
+    public AudioClip somColetaFragmento;
+    [Tooltip("Pitch do som no 1º fragmento")]
+    public float pitchInicial = 1.0f;
+    [Tooltip("Incremento do pitch a cada novo fragmento coletado")]
+    public float incrementoPitch = 0.1f;
+
     private Coroutine coroutineAviso;
 
     /// <summary>
@@ -43,6 +51,9 @@ public class JournalManager : MonoBehaviour
 
         if (blockedTextWarning != null) blockedTextWarning.gameObject.SetActive(false);
         if (painelDiarioCompleto != null) painelDiarioCompleto.SetActive(false);
+
+        // Tenta buscar o AudioSource no próprio GameObject caso não tenha sido atribuído no Inspector
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
 
         // Se já coletou pelo menos um fragmento, mantém a UI visível ao retornar à cena
         if (progressUI != null)
@@ -74,6 +85,9 @@ public class JournalManager : MonoBehaviour
         PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
         PlayerPrefs.Save();
 
+        // Toca o som com pitch progressivo
+        TocarSomColeta();
+
         if (progressUI != null && !progressUI.activeSelf)
         {
             progressUI.SetActive(true);
@@ -96,6 +110,8 @@ public class JournalManager : MonoBehaviour
         PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
         PlayerPrefs.Save();
 
+        TocarSomColeta();
+
         if (progressUI != null && !progressUI.activeSelf)
         {
             progressUI.SetActive(true);
@@ -106,6 +122,20 @@ public class JournalManager : MonoBehaviour
         if (fragmentosColetados >= totalFragmentos)
         {
             CompletarDiario();
+        }
+    }
+
+    /// <summary>
+    /// Aplica a variação de tom (pitch) de acordo com a quantidade atual de fragmentos coletados
+    /// </summary>
+    private void TocarSomColeta()
+    {
+        if (audioSource != null && somColetaFragmento != null)
+        {
+            // Calcula o pitch com base na quantidade coletada (ex: 1º item = 1.0, 2º = 1.1, 3º = 1.2...)
+            float pitchCalculado = pitchInicial + ((fragmentosColetados - 1) * incrementoPitch);
+            audioSource.pitch = pitchCalculado;
+            audioSource.PlayOneShot(somColetaFragmento);
         }
     }
 
@@ -135,6 +165,12 @@ public class JournalManager : MonoBehaviour
     public void ExibirAvisoBloqueado()
     {
         if (coroutineAviso != null) StopCoroutine(coroutineAviso);
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.TocarErroBloqueio();
+        }
+
         coroutineAviso = StartCoroutine(MostrarTextoTemporario("Você não pode entrar aqui ainda!", 2.0f));
     }
 

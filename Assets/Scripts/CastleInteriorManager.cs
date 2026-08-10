@@ -152,17 +152,16 @@ public class CastleInteriorManager : MonoBehaviour
 
     private IEnumerator RotinaAcordarEmaComDelay()
     {
-        // Esconde o botão imediatamente
         if (wakeUpButton != null) wakeUpButton.SetActive(false);
 
-        // Delay 1: Espera para acordar
+        // Delay antes de acordar
         yield return new WaitForSeconds(delayParaAcordar);
 
-        // Troca de sprites
+        // Troca os sprites
         if (sleepingEma != null) sleepingEma.SetActive(false);
         if (awokenEma != null) awokenEma.SetActive(true);
 
-        // Toca o efeito sonoro de acordar
+        // Toca o som de bocejo / despertar
         if (audioSource != null && somAcordar != null)
         {
             audioSource.PlayOneShot(somAcordar);
@@ -170,7 +169,7 @@ public class CastleInteriorManager : MonoBehaviour
 
         emaJaAcordou = true;
 
-        // Delay 2: Espera para abrir o painel de vitória
+        // Delay até abrir o painel de vitória
         yield return new WaitForSeconds(delayPainelVitoria);
 
         if (gameWonPanel != null)
