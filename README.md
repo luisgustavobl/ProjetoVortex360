@@ -1,12 +1,12 @@
-# Os Caçadores da Moema Perdida — Navegador Panorâmico 360° (Vortex)
+# Os Caçadores da Moema Perdida — Protótipo Vortex360
 
 > **Versão online (WebGL):** [Link no itch.io](https://luisgustavobl.itch.io/projeto-vortex360)
 
-Projeto desenvolvido como protótipo de navegação panorâmica interativa em 360° utilizando imagens equirretangulares, shaders e mecânicas de gamificação no ecossistema **Unity 6 (URP)** para o Desafio Técnico do Laboratório Vortex (UNIFOR).
+Projeto desenvolvido como protótipo de navegação panorâmica interativa em 360° no ecossistema **Unity 6 (URP)** para o Desafio Técnico do Laboratório Vortex (UNIFOR).
 
 ---
 
-## Narrative Design
+## Narrativa
 
 Durante uma expedição nas redondezas de uma histórica capela/castelo nas montanhas, a aventureira Moema desapareceu. O jogador assume o papel de um caçador de pistas navegando pela área externa, investigando panoramas para reunir os **5 fragmentos do diário** de Moema. Somente com o diário reconstituído é possível desbloquear a entrada do castelo, encontrar a Moema e resgatá-la.
 
