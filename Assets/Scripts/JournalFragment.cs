@@ -11,10 +11,18 @@ public class JournalFragment : MonoBehaviour
 
     private void Start()
     {
-        // Se o fragmento já foi coletado anteriormente, oculta o objeto
+        // Se já foi coletado previamente, desativa o objeto imediatamente
         if (JournalManager.Instance != null && JournalManager.Instance.FragmentoJaColetado(fragmentIndex))
         {
             gameObject.SetActive(false);
+            return;
+        }
+
+        // Caso o StreetViewManager já esteja pronto, valida se deve aparecer no panorama atual
+        if (StreetViewManager.Instance != null)
+        {
+            bool ehOPanoramaCorreto = (panoramaIndex == StreetViewManager.Instance.ObterIndiceAtual());
+            gameObject.SetActive(ehOPanoramaCorreto);
         }
     }
 

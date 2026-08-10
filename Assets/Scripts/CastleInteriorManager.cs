@@ -34,9 +34,11 @@ public class CastleInteriorManager : MonoBehaviour
     public float delayPainelVitoria = 2.0f;
     private bool emaJaAcordou = false;
 
-    [Header("Efeito Sonoro (Áudio de Acordar)")]
+    [Header("Efeito Sonoro (Áudios)")]
     public AudioSource audioSource;
     public AudioClip somAcordar;
+    [Tooltip("Som reproduzido assim que a tela de vitória aparece")]
+    public AudioClip somVitoria;
 
     [Header("Ângulo da Moema")]
     [Tooltip("Ângulo Y mínimo para enxergar a Moema")]
@@ -133,10 +135,7 @@ public class CastleInteriorManager : MonoBehaviour
 
     public void SairDoCastelo()
     {
-        if (!string.IsNullOrEmpty(nomeCenaExterna))
-        {
-            SceneManager.LoadScene(nomeCenaExterna);
-        }
+        CarregarCenaTransicao(nomeCenaExterna);
     }
 
     /// <summary>
@@ -176,6 +175,12 @@ public class CastleInteriorManager : MonoBehaviour
         {
             gameWonPanel.SetActive(true);
         }
+
+        // Toca o som da vitória quando o painel é exibido
+        if (audioSource != null && somVitoria != null)
+        {
+            audioSource.PlayOneShot(somVitoria);
+        }
     }
 
     /// <summary>
@@ -183,9 +188,25 @@ public class CastleInteriorManager : MonoBehaviour
     /// </summary>
     public void VoltarAoMenuPrincipal()
     {
-        if (!string.IsNullOrEmpty(nomeCenaMenu))
+        CarregarCenaTransicao(nomeCenaMenu);
+    }
+
+    /// <summary>
+    /// Carrega a cena desejada utilizando o SceneTransitionManager (com suporte a Fade Out/In)
+    /// ou utiliza o SceneManager tradicional como fallback para testes locais.
+    /// </summary>
+    private void CarregarCenaTransicao(string nomeCena)
+    {
+        if (!string.IsNullOrEmpty(nomeCena))
         {
-            SceneManager.LoadScene(nomeCenaMenu);
+            if (SceneTransitionManager.Instance != null)
+            {
+                SceneTransitionManager.Instance.CarregarCena(nomeCena);
+            }
+            else
+            {
+                SceneManager.LoadScene(nomeCena);
+            }
         }
     }
 

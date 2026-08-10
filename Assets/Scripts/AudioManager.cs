@@ -9,12 +9,42 @@ public class AudioManager : MonoBehaviour
 
     [Header("Efeitos Sonoros de UI")]
     public AudioClip somCliqueBotao;
-    public AudioClip somErroBloqueio;
-    public AudioClip somCliqueLongo;
-    public AudioClip somCliqueDiscover;
 
-    [Header("Efeitos Sonoros Ema")]
-    public AudioClip somCliqueB;
+    [Range(0f, 1f)]
+    [Tooltip("Volume exclusivo para cliques.")]
+    public float volumeCliques = 0.5f;
+
+    [Range(0f, 2f)]
+    public AudioClip somErroBloqueio;
+    [Tooltip("Volume exclusivo para erros.")]
+    public float volumeErroBloqueio = 0.5f;
+
+
+    [Header("Efeitos Sonoros de Movimentação (Passos/Seta)")]
+    [Tooltip("Lista de áudios sorteados aleatoriamente ao clicar nas setas de avançar/voltar")]
+    public AudioClip[] sonsPassoPanorama;
+
+    [Range(0f, 1f)]
+    [Tooltip("Volume exclusivo dos passos (0 = mudo, 1 = volume máximo)")]
+    public float volumePassos = 0.5f; // Valor padrão em 50% do volume
+
+
+    [Header("Outros efeitos:")]
+    [Tooltip("Placeholder")]
+    public AudioClip somCliquePH;
+    [Range(0f, 1f)]
+    [Tooltip("Volume exclusivo para placeholder.")]
+    public float volumeCliquePH = 0.5f;
+
+    public AudioClip somCliqueSpecial;
+    [Range(0f, 2f)]
+    [Tooltip("Volume exclusivo para cliques especiais.")]
+    public float volumeCliqueSpecial = 0.5f;
+
+    public AudioClip somDiscover;
+    [Range(0f, 2f)]
+    [Tooltip("Volume exclusivo para descobertas.")]
+    public float volumeDiscover = 0.5f;
 
     void Awake()
     {
@@ -31,7 +61,7 @@ public class AudioManager : MonoBehaviour
     {
         if (audioSource != null && somCliqueBotao != null)
         {
-            audioSource.PlayOneShot(somCliqueBotao);
+            audioSource.PlayOneShot(somCliqueBotao, volumeCliques);
         }
     }
 
@@ -39,22 +69,53 @@ public class AudioManager : MonoBehaviour
     {
         if (audioSource != null && somErroBloqueio != null)
         {
-            audioSource.PlayOneShot(somErroBloqueio);
+            audioSource.PlayOneShot(somErroBloqueio, volumeErroBloqueio);
+
         }
     }
 
-    public void TocarCliqueBotaoLongo()
+    /// <summary>
+    /// Sorteia e toca um áudio aleatório da lista de movimentação aplicando a escala de volume customizada
+    /// </summary>
+    public void TocarSomPassoPanorama()
     {
-        if (audioSource != null && somCliqueLongo != null)
+        if (audioSource != null && sonsPassoPanorama != null && sonsPassoPanorama.Length > 0)
         {
-            audioSource.PlayOneShot(somCliqueLongo);
+            int indiceSorteado = Random.Range(0, sonsPassoPanorama.Length);
+            AudioClip somSorteado = sonsPassoPanorama[indiceSorteado];
+
+            if (somSorteado != null)
+            {
+                // O segundo parâmetro do PlayOneShot define o volume relativo (de 0.0 a 1.0)
+                audioSource.PlayOneShot(somSorteado, volumePassos);
+            }
+        }
+        else
+        {
+            // Fallback
+            //TocarCliqueBotao();
         }
     }
-    public void TocarCliqueBotaoDiscover()
+
+    public void TocarCliqueB()
     {
-        if (audioSource != null && somCliqueDiscover != null)
+        if (audioSource != null && somCliquePH!= null)
         {
-            audioSource.PlayOneShot(somCliqueDiscover);
+            audioSource.PlayOneShot(somCliquePH, volumeCliquePH);
+        }
+    }
+    public void TocarCliqueBotaoSpecial()
+    {
+        if (audioSource != null && somCliqueSpecial != null)
+        {
+            audioSource.PlayOneShot(somCliqueSpecial, volumeCliqueSpecial);
+        }
+    }
+    public void TocarDiscover()
+    {
+        if (audioSource != null && somDiscover != null)
+        {
+            audioSource.PlayOneShot(somDiscover, volumeDiscover);
         }
     }
 }

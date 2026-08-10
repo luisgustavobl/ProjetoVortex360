@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class StreetViewManager : MonoBehaviour
 {
+    public static StreetViewManager Instance;
+
     [Header("Configuração de Fotos")]
     public Material skyboxMaterial;
     public Cubemap[] listaDeFotos;
@@ -55,8 +57,15 @@ public class StreetViewManager : MonoBehaviour
     private Coroutine coroutineAlerta;
     private bool olhandoParaFrente = true;
 
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     void Start()
     {
+        // 1. Carrega o panorama inicial ou salvo no PlayerPrefs
         if (PlayerPrefs.HasKey("UltimoPanoramaIndex"))
         {
             indiceAtual = PlayerPrefs.GetInt("UltimoPanoramaIndex");
@@ -72,7 +81,6 @@ public class StreetViewManager : MonoBehaviour
         if (warningCanvasGroup != null) warningCanvasGroup.alpha = 0;
         if (enterCastleButton != null) enterCastleButton.SetActive(false);
 
-        // Garante que ambos os botões fiquem visíveis na interface
         if (stepUpButton != null) stepUpButton.gameObject.SetActive(true);
         if (stepBackButton != null) stepBackButton.gameObject.SetActive(true);
 
@@ -81,15 +89,33 @@ public class StreetViewManager : MonoBehaviour
             cameraTransform = Camera.main.transform;
         }
 
-        // Configura os ouvintes de clique nos botões via script
         ConfigurarEventosDeClique();
+
+        // 2. Aguarda um frame para que todos os fragmentos e managers tenham rodado o Awake/Start após a transição de cena
+        StartCoroutine(InicializarFragmentosAposCarregamento());
+    }
+
+    private IEnumerator InicializarFragmentosAposCarregamento()
+    {
+        yield return null; // Aguarda 1 frame completo do Unity
+
+        if (fragmentosDoDiario == null || fragmentosDoDiario.Length == 0)
+        {
+            fragmentosDoDiario = FindObjectsByType<JournalFragment>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        }
+
+        AtualizarVisibilidadeFragmentos();
+    }
+
+    public int ObterIndiceAtual()
+    {
+        return indiceAtual;
     }
 
     private void ConfigurarEventosDeClique()
     {
         if (stepUpButton != null)
         {
-            // Limpa qualquer evento antigo e vincula a lógica com inversão de ângulo
             stepUpButton.onClick.RemoveAllListeners();
             stepUpButton.onClick.AddListener(AoClicarSetaCima);
         }
@@ -103,7 +129,6 @@ public class StreetViewManager : MonoBehaviour
 
     void Update()
     {
-        // Navegação por teclado (WASD / Setas)
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             ProximaFoto();
@@ -123,10 +148,8 @@ public class StreetViewManager : MonoBehaviour
         float anguloY = cameraTransform.eulerAngles.y;
         anguloY = NormalizarAngulo(anguloY);
 
-        // Verifica se está dentro da faixa de frente (-90° a 90°, ou seja, 270° a 90°)
         olhandoParaFrente = ChecarAnguloNoIntervalo(anguloY, anguloMinimoFrente, anguloMaximoFrente);
 
-        // Checagem para o botão de entrar no Castelinho
         if (enterCastleButton != null)
         {
             if (indiceAtual == indicePanoramaCastelinho)
@@ -143,26 +166,14 @@ public class StreetViewManager : MonoBehaviour
 
     public void AoClicarSetaCima()
     {
-        TocarSomClique();
-
         if (olhandoParaFrente) ProximaFoto();
         else FotoAnterior();
     }
 
     public void AoClicarSetaBaixo()
     {
-        TocarSomClique();
-
         if (olhandoParaFrente) FotoAnterior();
         else ProximaFoto();
-    }
-
-    private void TocarSomClique()
-    {
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.TocarCliqueBotao();
-        }
     }
 
     private float NormalizarAngulo(float angulo)
@@ -187,10 +198,12 @@ public class StreetViewManager : MonoBehaviour
         if (indiceAtual >= listaDeFotos.Length - 1)
         {
             DispararAlertaLimite();
+            if (AudioManager.Instance != null) AudioManager.Instance.TocarErroBloqueio();
             return;
         }
 
         indiceAtual++;
+        if (AudioManager.Instance != null) AudioManager.Instance.TocarSomPassoPanorama();
         AtualizarFoto();
     }
 
@@ -200,11 +213,13 @@ public class StreetViewManager : MonoBehaviour
 
         if (indiceAtual <= 0)
         {
+            if (AudioManager.Instance != null) AudioManager.Instance.TocarErroBloqueio();
             DispararAlertaLimite();
             return;
         }
 
         indiceAtual--;
+        if (AudioManager.Instance != null) AudioManager.Instance.TocarSomPassoPanorama();
         AtualizarFoto();
     }
 
@@ -218,7 +233,7 @@ public class StreetViewManager : MonoBehaviour
             if (JournalManager.Instance.PodeEntrarNoCastelo())
             {
                 JournalManager.Instance.OcultarProgressoEntradaCastelo();
-                SceneManager.LoadScene(nomeCenaInteriorCastelo);
+                CarregarCenaTransicao(nomeCenaInteriorCastelo);
             }
             else
             {
@@ -227,7 +242,19 @@ public class StreetViewManager : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(nomeCenaInteriorCastelo);
+            CarregarCenaTransicao(nomeCenaInteriorCastelo);
+        }
+    }
+
+    private void CarregarCenaTransicao(string nomeCena)
+    {
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.CarregarCena(nomeCena);
+        }
+        else
+        {
+            SceneManager.LoadScene(nomeCena);
         }
     }
 
@@ -285,7 +312,7 @@ public class StreetViewManager : MonoBehaviour
         AtualizarVisibilidadeFragmentos();
     }
 
-    private void AtualizarVisibilidadeFragmentos()
+    public void AtualizarVisibilidadeFragmentos()
     {
         if (fragmentosDoDiario == null) return;
 

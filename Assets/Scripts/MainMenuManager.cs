@@ -15,23 +15,21 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     public void IniciarJogo()
     {
-        // Reseta o panorama salvo para garantir que o jogador comece do inicio (panorama 0)
         if (PlayerPrefs.HasKey("UltimoPanoramaIndex"))
         {
             PlayerPrefs.DeleteKey("UltimoPanoramaIndex");
             PlayerPrefs.Save();
         }
 
-        // Reseta os fragmentos coletados para que um novo jogo comece com o diário zerado
         JournalManager.ResetarProgressoColeta();
 
-        if (!string.IsNullOrEmpty(nomeCenaJogo))
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.CarregarCena(nomeCenaJogo);
+        }
+        else if (!string.IsNullOrEmpty(nomeCenaJogo))
         {
             SceneManager.LoadScene(nomeCenaJogo);
-        }
-        else
-        {
-            Debug.LogError("O nome da cena do jogo não foi configurado no MainMenuManager!");
         }
     }
 

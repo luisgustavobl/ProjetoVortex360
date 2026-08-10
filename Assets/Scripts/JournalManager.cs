@@ -19,11 +19,9 @@ public class JournalManager : MonoBehaviour
 
     [Header("Efeitos Sonoros dos Fragmentos")]
     public AudioSource audioSource;
-    public AudioClip somColetaFragmento;
-    [Tooltip("Pitch do som no 1º fragmento")]
-    public float pitchInicial = 1.0f;
-    [Tooltip("Incremento do pitch a cada novo fragmento coletado")]
-    public float incrementoPitch = 0.1f;
+
+    [Tooltip("Lista de efeitos sonoros sorteados aleatoriamente a cada coleta")]
+    public AudioClip[] sonsColetaFragmento; // Array para os áudios (bookCollect1, bookCollect2, etc.)
 
     private Coroutine coroutineAviso;
 
@@ -85,8 +83,8 @@ public class JournalManager : MonoBehaviour
         PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
         PlayerPrefs.Save();
 
-        // Toca o som com pitch progressivo
-        TocarSomColeta();
+        // Toca um som sorteado da lista
+        TocarSomColetaAleatorio();
 
         if (progressUI != null && !progressUI.activeSelf)
         {
@@ -110,7 +108,7 @@ public class JournalManager : MonoBehaviour
         PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
         PlayerPrefs.Save();
 
-        TocarSomColeta();
+        TocarSomColetaAleatorio();
 
         if (progressUI != null && !progressUI.activeSelf)
         {
@@ -126,16 +124,20 @@ public class JournalManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Aplica a variação de tom (pitch) de acordo com a quantidade atual de fragmentos coletados
+    /// Sorteia um áudio aleatório da lista e toca sem alterar o pitch
     /// </summary>
-    private void TocarSomColeta()
+    private void TocarSomColetaAleatorio()
     {
-        if (audioSource != null && somColetaFragmento != null)
+        if (audioSource != null && sonsColetaFragmento != null && sonsColetaFragmento.Length > 0)
         {
-            // Calcula o pitch com base na quantidade coletada (ex: 1º item = 1.0, 2º = 1.1, 3º = 1.2...)
-            float pitchCalculado = pitchInicial + ((fragmentosColetados - 1) * incrementoPitch);
-            audioSource.pitch = pitchCalculado;
-            audioSource.PlayOneShot(somColetaFragmento);
+            // Sorteia um índice do array de sons
+            int indiceSorteado = Random.Range(0, sonsColetaFragmento.Length);
+            AudioClip somSorteado = sonsColetaFragmento[indiceSorteado];
+
+            if (somSorteado != null)
+            {
+                audioSource.PlayOneShot(somSorteado);
+            }
         }
     }
 
