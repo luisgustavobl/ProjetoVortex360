@@ -19,6 +19,11 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
   - Botões UI permanentes (`StepUpButton` e `StepBackButton`).
   - Mapeamento angular inteligente: quando a câmera aponta para a frente (entre 270° e 90° na bússola), a seta de cima avança e a de baixo recua. Ao girar para trás (entre 90° e 270°), os comandos se invertem para acompanhar o campo de visão do jogador.
   - Suporte secundário a teclas de atalho (WASD / Setas).
+- [X] **Minimapa 2D Interativo com Rastreamento em Tempo Real (`MinimapManager.cs`):**
+  - Representação visual 2D da trilha/mapa no canto da tela.
+  - Pino marcador do jogador (`PlayerPin`) com interpolação suave (`Vector2.Lerp`) deslocando-se entre Waypoints ancorados conforme o panorama atual.
+  - Indicador de cone de visão (`VisionCone`) sincronizado em tempo real com a bússola/ângulo $Y$ da câmera.
+  - Campo de compensação angular (`offsetAnguloCone`) no Inspector para ajuste fino e calibração de alinhamento com a arte do mapa.
 - [X] **Controle de Câmera:** Rotação livre (Pan via mouse) com limite vertical e aproximação/afastamento (Zoom no Scroll com FOV `30-70`).
 - [X] **Gerenciador de Transição de Cenas Global (`SceneTransitionManager.cs`):**
   - Objeto persistente via `DontDestroyOnLoad` com um único `CanvasGroup` e renderização em ordem prioritária (`Sort Order 9999`).
@@ -29,26 +34,31 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
 - [X] **Estrutura Múltipla de Cenas com Transição Suave:** Fluxo contínuo entre `MenuScene`, `SampleScene` (Área Externa) e `CastleInteriorScene` (Interior do Castelo).
 - [X] **Menu Inicial Interativo:** Fundo panorâmico 360° em rotação contínua (`MenuPanoramaRotator.cs`).
 - [X] **Gatilhos Condicionais por Ângulo da Câmera:**
-  - O botão de entrada no castelo (`EnterCastleButton`) só é exibido no panorama 15 quando o jogador aponta a câmera diretamente na direção da porta.
+  - O botão de entrada no castelo (`EnterCastleButton`) só é exibido no panorama do castelo quando o jogador aponta a câmera diretamente na direção da porta.
   - O botão de saída e o botão de ação no interior só aparecem nos ângulos específicos das estruturas/personagem.
-- [X] **Mecânica de Gamificação & Diário de Bordo:**
+- [X] **Mecânica de Gamificação & Animação do Diário (`BookPanelProgress.cs`):**
   - Coleta de 5 fragmentos escondidos nos panoramas via clique 3D (`Raycast` e `Colliders`).
-  - Atualização assíncrona automática da visibilidade dos fragmentos ($1$ frame após o fim do carregamento da cena) para sincronização perfeita com a transição.
+  - Animação individual de impacto e mola (`AnimationCurve`) ao encaixar cada peça no painel da coleção.
+  - Sequência de **Fusão Mágica** ao coletar o 5º e último fragmento:
+    - O painel desliza de forma fluida até o centro da tela (`anchoredPosition = Vector2.zero`).
+    - Desativação automática do botão de fechar durante a fusão para evitar interrupções de fluxo.
+    - Animação de pulso e transição de cor radiante/neon exclusiva nas artes dos 5 fragmentos (`slotImages`).
+    - Transição perfeita para a revelação do diário completo restaurado (`CompletedBookPanel`).
+  - Atualização assíncrona automática da visibilidade dos fragmentos ($1$ frame após o fim do carregamento da cena).
   - Contador de progresso condicional na HUD (`3/5`), ativado somente após a primeira coleta.
   - Trava de segurança no castelo: tentar entrar sem o diário completo exibe o aviso temporário *"Você não pode entrar aqui ainda!"*.
-  - Revelação do diário restaurado em pergaminho ao coletar o 5º fragmento com botão de fechar (`CloseBookButton`).
 - [X] **Sistema de Áudio Centralizado & Escalas de Volume Exclusivas:**
   - Arquitetura de gerenciamento via `AudioManager.cs` e `JournalManager.cs`.
-  - **Sons de Passos em Movimentação:** Array de efeitos sonoros sorteados aleatoriamente ao caminhar pelos panoramas, com controle de volume independente (`volumePassos`), acionados apenas em passos válidos (sem ruído extra de clique de botão UI nem som em barreiras).
+  - **Sons de Passos em Movimentação:** Array de efeitos sonoros sorteados aleatoriamente ao caminhar pelos panoramas, com controle de volume independente (`volumePassos`).
   - **Controle Fino de Áudio:** Sliders individuais no Inspector para controle de escala de volume de cliques (`volumeCliques`), erros (`volumeErroBloqueio`), passos e efeitos especiais.
-  - **Sons de Coleta:** Sorteio aleatório entre 3 arquivos de áudio de páginas/livro ao coletar um fragmento, tocados no tom natural (1.0).
-  - Som exclusivo acionado na aparição da tela de vitória (`somVitoria`).
+  - **Sons de Coleta:** Sorteio aleatório entre arquivos de áudio de páginas/livro ao coletar um fragmento.
+  - Efeito sonoro exclusivo de descoberta (`TocarDiscover`) ao revelar o diário completo e som de vitória no encerramento (`somVitoria`).
 - [X] **Mecânica da Moema (Interior do Castelo):**
   - Troca de sprite/estado com delay customizável (`EmaSleeping` -> `EmaAwake`) e reprodução de som de despertar.
   - Sombra projetada no bloco (`Blob/Drop Shadow`) para garantir ancoragem visual do sprite no cenário 3D.
 - [X] **Persistência de Progresso (`PlayerPrefs`):**
-  - Salvamento do último panorama visitado (retorna ao panorama 15 ao sair do castelo em vez de reiniciar no ponto zero).
-  - Fragmentos coletados salvos permanentemente via chaves únicas (`Fragmento_X`), evitando contagem duplicada e impedindo perda do progresso ao mudar de cena.
+  - Salvamento do último panorama visitado (retorna ao panorama de origem ao sair do castelo em vez de reiniciar no ponto zero).
+  - Fragmentos coletados salvos permanentemente via chaves únicas de índice ($0$ a $4$), evitando contagem duplicada.
   - Botão "JOGAR" no Menu Principal que reseta limpo os dados do `PlayerPrefs` para um novo jogo do zero.
 - [X] **Tela de Vitória & Loop de Fim de Jogo (`GameWonPanel`):**
   - Painel de encerramento ativado com delay após a Moema acordar, acompanhado por efeito sonoro de vitória (`somVitoria`).
@@ -57,48 +67,31 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
 
 ---
 
-## Polimento Visual & Arquitetura
-
-- [X] **Efeitos Sonoros Dedicados (SFX):**
-  - Efeito sonoro de despertar ao acionar a interação com a Moema.
-  - Som de jingle/vitória no surgimento do painel de encerramento.
-  - Passos táticos nos botões de navegação e efeito sonoro na colisão com as bordas do mapa.
-- [X] **Transição Suave (Fade In / Fade Out):**
-  - Sistema global desacoplado responsável pelo gerenciamento de telas pretas e trocas de cena assíncronas em toda a aplicação.
-
----
-
 ## AI Logbook
 
-Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parceira de desenvolvimento (*Pair Programming*) para arquitetura de código C#, refatoração de matemática vetorial/angular, persistência de dados, design de gerenciadores de áudio e transição de cenas, e otimização de exportação WebGL.
+Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parceira de desenvolvimento (*Pair Programming*) para arquitetura de código C#, refatoração de matemática vetorial/angular, persistência de dados, design de gerenciadores de áudio e transição de cenas, animação procedural via UI e otimização de exportação WebGL.
 
 ### Histórico de Desenvolvimento e Desafios
 
-#### **Etapa Initial: Prototipação e Pipeline**
-
+#### **Etapa Inicial: Prototipação e Pipeline**
 - **Fase 1: Rotação 360° e Input System:** Implementação da câmera rotacional (`CameraRotator.cs`). Ajuste nas preferências de entrada para URP e limites de inclinação vertical.
 - **Fase 2: Gerenciamento da Rota:** Script `StreetViewManager.cs` para percorrer a lista de Cubemaps/Panoramas via teclado e UI.
 - **Fase 3: Feedback de Limite de Mapa:** Implementação da Coroutine de *flash* vermelho e *fade out* suave para limites da rota.
-- **Fase 4: Otimização WebGL:** Redução da build de ~300 MB para ~70 MB substituindo Cubemaps pesados por marcação panorâmica equirretangular `Skybox/Panoramic` com compressão para Web.
+- **Fase 4: Otimização WebGL:** Redução da build substituindo Cubemaps pesados por marcação panorâmica equirretangular `Skybox/Panoramic` com compressão para Web.
 
 #### **Etapa 1: Arquitetura Multicenas & Posição Angular**
-
 - **Gatilho de Visão por Bússola:** Desenvolvimento da normalização angular (`NormalizarAngulo` / `ChecarAnguloNoIntervalo`) para converter rotações negativas do Unity (ex: -90° transformado em 270°) e validar o campo de visão do jogador.
-- **Fase de Interior (`CastleInteriorScene`):** Criação da cena dedicada para o interior do castelo com suporte a ângulo de entrada customizado no `CameraRotator`.
+- **Fase de Interior (`CastleInteriorScene`):** Criação da cena dedicada para o interior do castelo com suporte a ângulo de entrada customizado.
 
 #### **Etapa 2: Gamificação, Áudio Dinâmico e Navegação Contextual**
-
 - **Sistema de Coleta e Diário (`JournalManager.cs` / `JournalFragment.cs`):** Centralização do áudio de coleta no manager com sorteio aleatório de sons.
 - **Navegação Invertida Dinâmica:** Refatoração do `StreetViewManager.cs` para manter botões de navegação sempre na tela e inverter o sentido de avanço/recuo caso o jogador esteja olhando para trás no cenário.
-- **Persistência de Dados entre Cenas:** Resolução do bug de reset de progresso. Implementação de chaves únicas no `PlayerPrefs` (`Fragmento_X` e `UltimoPanoramaIndex`) permitindo entrar/sair do castelo sem perder os itens coletados.
-- **Animação de Despertar e Tela de Vitória:** Implementação das Coroutines no `CastleInteriorManager.cs` com suporte a delays customizáveis, ativação de sprites e fluxo de botões para explorar a sala ou retornar ao menu.
+- **Persistência de Dados entre Cenas:** Resolução do bug de reset de progresso através do uso de chaves únicas no `PlayerPrefs` (`Fragmento_X` e `UltimoPanoramaIndex`).
 
-#### **Etapa 3: Gerenciamento Global, Polimento de Áudio e Transição de Cenas**
-
-- **Sistema de Passos e Escalas de Volume:** Refatoração do `AudioManager.cs` para suportar lista de áudios aleatórios de passos e escalas de volume exclusivas por tipo de som (passos, cliques UI, erros).
-- **Remoção de Duplicação de Clique:** Limpeza dos ouvintes de eventos no Inspector para que as setas de movimentação reproduzam unicamente os passos do panorama ao mudar de foto.
-- **Gerenciador de Transições Global (`SceneTransitionManager.cs`):** Criação do componente Singleton com `DontDestroyOnLoad` responsável por controlar o `CanvasGroup` de transição, reproduzir o áudio de troca e executar o `LoadSceneAsync`.
-- **Sincronização de Sinais e Visibilidade:** Ajuste no `StreetViewManager.cs` e `JournalFragment.cs` utilizando `FindObjectsInactive.Include` e espera de $1$ frame após o carregamento assíncrono para garantir que os fragmentos do diário sejam exibidos instantaneamente no panorama carregado.
+#### **Etapa 3: Gerenciamento Global, Polimento e AnimaçõesProcedurais**
+- **Refatoração do Painel da Coleção (`BookPanelProgress.cs`):** Solução de bugs de sobreposição de canvas e centralização das coordenadas via `RectTransform`. Implementação da fusão visual com interpolação de cor e pulso exclusivo nas peças de fragmentos.
+- **Implementação do Minimapa 2D (`MinimapManager.cs`):** Criação da lógica de navegação em minimapa com interpolação de pino via `Vector2.Lerp`, acompanhamento do cone de visão e sistema de `offsetAnguloCone` para calibração com a arte 2D.
+- **Gerenciador de Transições Global (`SceneTransitionManager.cs`):** Componente Singleton com `DontDestroyOnLoad` responsável por controlar o `CanvasGroup` de transição e executar o `LoadSceneAsync`.
 
 ---
 
