@@ -74,21 +74,25 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 ### Histórico de Desenvolvimento e Desafios
 
 #### **Etapa Inicial: Prototipação e Pipeline**
+
 - **Fase 1: Rotação 360° e Input System:** Implementação da câmera rotacional (`CameraRotator.cs`). Ajuste nas preferências de entrada para URP e limites de inclinação vertical.
 - **Fase 2: Gerenciamento da Rota:** Script `StreetViewManager.cs` para percorrer a lista de Cubemaps/Panoramas via teclado e UI.
 - **Fase 3: Feedback de Limite de Mapa:** Implementação da Coroutine de *flash* vermelho e *fade out* suave para limites da rota.
 - **Fase 4: Otimização WebGL:** Redução da build substituindo Cubemaps pesados por marcação panorâmica equirretangular `Skybox/Panoramic` com compressão para Web.
 
 #### **Etapa 1: Arquitetura Multicenas & Posição Angular**
+
 - **Gatilho de Visão por Bússola:** Desenvolvimento da normalização angular (`NormalizarAngulo` / `ChecarAnguloNoIntervalo`) para converter rotações negativas do Unity (ex: -90° transformado em 270°) e validar o campo de visão do jogador.
 - **Fase de Interior (`CastleInteriorScene`):** Criação da cena dedicada para o interior do castelo com suporte a ângulo de entrada customizado.
 
 #### **Etapa 2: Gamificação, Áudio Dinâmico e Navegação Contextual**
+
 - **Sistema de Coleta e Diário (`JournalManager.cs` / `JournalFragment.cs`):** Centralização do áudio de coleta no manager com sorteio aleatório de sons.
 - **Navegação Invertida Dinâmica:** Refatoração do `StreetViewManager.cs` para manter botões de navegação sempre na tela e inverter o sentido de avanço/recuo caso o jogador esteja olhando para trás no cenário.
 - **Persistência de Dados entre Cenas:** Resolução do bug de reset de progresso através do uso de chaves únicas no `PlayerPrefs` (`Fragmento_X` e `UltimoPanoramaIndex`).
 
 #### **Etapa 3: Gerenciamento Global, Polimento e AnimaçõesProcedurais**
+
 - **Refatoração do Painel da Coleção (`BookPanelProgress.cs`):** Solução de bugs de sobreposição de canvas e centralização das coordenadas via `RectTransform`. Implementação da fusão visual com interpolação de cor e pulso exclusivo nas peças de fragmentos.
 - **Implementação do Minimapa 2D (`MinimapManager.cs`):** Criação da lógica de navegação em minimapa com interpolação de pino via `Vector2.Lerp`, acompanhamento do cone de visão e sistema de `offsetAnguloCone` para calibração com a arte 2D.
 - **Gerenciador de Transições Global (`SceneTransitionManager.cs`):** Componente Singleton com `DontDestroyOnLoad` responsável por controlar o `CanvasGroup` de transição e executar o `LoadSceneAsync`.
@@ -101,3 +105,18 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 - **Linguagem:** C#
 - **Hospedagem WebGL:** itch.io
 - **Assistente IA:** Gemini (Pair Programming e Resolução de Bugs)
+
+---
+
+## Créditos Autorais:
+
+- **Imagem da Moema:** Unifor
+- **Foto Capela mapa (Modificado por IA):** [Capela Donaninha - Carlos Google Maps](https://www.google.com.br/maps/place/Capela+Donaninha/@-4.2296704,-38.9284619,3a,75y,90t/data=!3m8!1e2!3m6!1sCIABIhADycTjuCAVomfQGvoADrOE!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FAHRPTWnzTTeLFsi4tocQLgp8EkbWZQBUu5WV7ZiCFhGUkuID_oJF86oiynPzSsiwLl8PX491QUEHAnRIHCirJMiMD4kUc0Iv5q2NSngt205HtjNhF5bCaA3CR7rMavx7bq_7weWt-5fOnWK9NNUY%3Dw114-h86-k-no!7i4000!8i3000!4m7!3m6!1s0x7bf475380bd2abf:0x1702e5ea1948f204!8m2!3d-4.2297093!4d-38.9284039!10e5!16s%2Fg%2F11cn2md8_l?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D)
+- **Icones:** [Kenney](https://kenney.nl/assets/game-icons)
+- **Efeitos sonoros:** [Pixabay](https://pixabay.com/pt/sound-effects/)
+
+---
+
+## Referências:
+
+- **Navegação no mundo:** [Website Vortex![1786417722262](image/README/1786417722262.png)](https://vortex.unifor.br/about#laboratory)
