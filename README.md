@@ -12,6 +12,16 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
 
 ---
 
+
+## Bugs a serem corrigidos:
+- **Double click**: Ao clicar nos botões de movimentação, o jogador avança dois passos em vez de um.
+  - `Workaround:` Utilizar *W/A/S/D* para movimentações curtas.
+- **Movimentação invertida**: Ao virar 180°, movimentar utilizando *W/A/S/D* se torna invertido, mesmo que as setas indiquem o contrário
+  - `Workaround:` Utilizar as os *botões da UI* ou *reverter a câmera* para a posição original e assim utilizar *W/A/S/D*.
+
+---
+
+
 ## Funcionalidades Implementadas
 
 - [X] **Visualização Panorâmica 360°:** Projeção esférica equirretangular via Shader URP e Cubemaps.
