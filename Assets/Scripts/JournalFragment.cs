@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class JournalFragment : MonoBehaviour
@@ -11,18 +12,36 @@ public class JournalFragment : MonoBehaviour
 
     private void Start()
     {
-        // Se já foi coletado previamente, desativa o objeto imediatamente
+        // Se já foi coletado previamente, esconde imediatamente
         if (JournalManager.Instance != null && JournalManager.Instance.FragmentoJaColetado(fragmentIndex))
         {
             gameObject.SetActive(false);
             return;
         }
 
-        // Caso o StreetViewManager já esteja pronto, valida se deve aparecer no panorama atual
+        // Aguarda 1 frame para ter certeza de que o StreetViewManager definiu o panorama correto
+        StartCoroutine(ValidarVisibilidadeInicial());
+    }
+
+    private IEnumerator ValidarVisibilidadeInicial()
+    {
+        yield return null; // Espera o próximo frame
+
+        if (JournalManager.Instance != null && JournalManager.Instance.FragmentoJaColetado(fragmentIndex))
+        {
+            gameObject.SetActive(false);
+            yield break;
+        }
+
         if (StreetViewManager.Instance != null)
         {
             bool ehOPanoramaCorreto = (panoramaIndex == StreetViewManager.Instance.ObterIndiceAtual());
             gameObject.SetActive(ehOPanoramaCorreto);
+        }
+        else
+        {
+            // Caso por algum motivo não haja StreetViewManager, mantém ativo para não sumir
+            gameObject.SetActive(true);
         }
     }
 

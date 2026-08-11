@@ -310,6 +310,12 @@ public class StreetViewManager : MonoBehaviour
         }
 
         AtualizarVisibilidadeFragmentos();
+
+        // Atualiza o minimapa com o índice do panorama atual
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.AtualizarPosicaoMinimapa(indiceAtual);
+        }
     }
 
     public void AtualizarVisibilidadeFragmentos()

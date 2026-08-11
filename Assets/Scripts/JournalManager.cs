@@ -48,6 +48,8 @@ public class JournalManager : MonoBehaviour
         fragmentosColetados = PlayerPrefs.GetInt("FragmentosColetados", 0);
 
         if (blockedTextWarning != null) blockedTextWarning.gameObject.SetActive(false);
+
+        // Mantemos o painelDiarioCompleto inativo no Start para não sobrepor a animação
         if (painelDiarioCompleto != null) painelDiarioCompleto.SetActive(false);
 
         // Tenta buscar o AudioSource no próprio GameObject caso não tenha sido atribuído no Inspector
@@ -83,7 +85,7 @@ public class JournalManager : MonoBehaviour
         PlayerPrefs.SetInt("FragmentosColetados", fragmentosColetados);
         PlayerPrefs.Save();
 
-        // Toca um som sorteado da lista
+        // Toca um som sorteado da lista de coleta
         TocarSomColetaAleatorio();
 
         if (progressUI != null && !progressUI.activeSelf)
@@ -93,7 +95,23 @@ public class JournalManager : MonoBehaviour
 
         AtualizarUI();
 
-        if (fragmentosColetados >= totalFragmentos)
+        // Verifica se este é o 5º fragmento para acionar a fusão mágica no BookPanelProgress
+        bool ehOUltimo = (fragmentosColetados >= totalFragmentos);
+
+        // Busca o BookPanelProgress com fallback de segurança
+        BookPanelProgress painelColecao = BookPanelProgress.Instance;
+        if (painelColecao == null)
+        {
+            painelColecao = FindObjectOfType<BookPanelProgress>(true);
+        }
+
+        // Apenas o BookPanelProgress gerenciará a animação do fragmento e a transição para o diário completo
+        if (painelColecao != null)
+        {
+            painelColecao.ExibirEAnimarFragmento(index, ehOUltimo);
+        }
+
+        if (ehOUltimo)
         {
             CompletarDiario();
         }
@@ -130,7 +148,6 @@ public class JournalManager : MonoBehaviour
     {
         if (audioSource != null && sonsColetaFragmento != null && sonsColetaFragmento.Length > 0)
         {
-            // Sorteia um índice do array de sons
             int indiceSorteado = Random.Range(0, sonsColetaFragmento.Length);
             AudioClip somSorteado = sonsColetaFragmento[indiceSorteado];
 
@@ -151,11 +168,7 @@ public class JournalManager : MonoBehaviour
 
     private void CompletarDiario()
     {
-        if (painelDiarioCompleto != null)
-        {
-            painelDiarioCompleto.SetActive(true);
-        }
-
+        // Registro de log informando o desbloqueio da porta
         Debug.Log("Todos os fragmentos foram coletados! A porta do Castelinho foi desbloqueada.");
     }
 
