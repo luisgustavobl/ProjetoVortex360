@@ -100,7 +100,7 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 #### **Etapa 4: Refatoração de Controles e Arquitetura por Setores Angulares**
 
 - **Solução de Duplicação de Clique (*Double Click*):** Limpeza e sincronização dos ouvintes de evento `onClick` em botões de UI para prevenir chamadas duplicadas nos métodos de movimentação.
-- **Mapeamento Angular em 6 Setores (`StreetViewManager.cs`):** Substituição da lógica de inversão binária por uma arquitetura de 6 setores (2 x 90° e 4 x 45°) centralizada pela variável `anguloCentralFrente`. Esse ajuste garantiu suporte fluido às teclas WASD/Setas sem falhas ou inversões indesejadas em visões diagonais.
+- **Mapeamento Angular em 6 Setores (`StreetViewManager.cs`):** Substituição da lógica de inversão binária por uma arquitetura de 6 setores (2 x 90° e 4 x 45°) centralizada pela variável `anguloCentralFrente`. Esse ajuste garantiu suporte fluido às teclas WASD/Setas sem falhas ou inversões indesejadas em visões diagonais.![1786501923756](image/README/1786501923756.png)
 
 ---
 
