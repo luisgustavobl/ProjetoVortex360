@@ -12,15 +12,14 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
 
 ---
 
-
 ## Bugs a serem corrigidos:
+
 - **Double click**: Ao clicar nos botões de movimentação, o jogador avança dois passos em vez de um.
   - `Workaround:` Utilizar *W/A/S/D* para movimentações curtas.
 - **Movimentação invertida**: Ao virar 180°, movimentar utilizando *W/A/S/D* se torna invertido, mesmo que as setas indiquem o contrário
   - `Workaround:` Utilizar as os *botões da UI* ou *reverter a câmera* para a posição original e assim utilizar *W/A/S/D*.
 
 ---
-
 
 ## Funcionalidades Implementadas
 
@@ -118,7 +117,7 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 
 ---
 
-## Créditos Autorais:
+## Créditos Autorais
 
 - **Imagem da Moema:** Unifor
 - **Foto Capela mapa (Modificado por IA):** [Capela Donaninha - Carlos Google Maps](https://www.google.com.br/maps/place/Capela+Donaninha/@-4.2296704,-38.9284619,3a,75y,90t/data=!3m8!1e2!3m6!1sCIABIhADycTjuCAVomfQGvoADrOE!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FAHRPTWnzTTeLFsi4tocQLgp8EkbWZQBUu5WV7ZiCFhGUkuID_oJF86oiynPzSsiwLl8PX491QUEHAnRIHCirJMiMD4kUc0Iv5q2NSngt205HtjNhF5bCaA3CR7rMavx7bq_7weWt-5fOnWK9NNUY%3Dw114-h86-k-no!7i4000!8i3000!4m7!3m6!1s0x7bf475380bd2abf:0x1702e5ea1948f204!8m2!3d-4.2297093!4d-38.9284039!10e5!16s%2Fg%2F11cn2md8_l?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D)
@@ -127,6 +126,6 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 
 ---
 
-## Referências:
+## Referências
 
 - **Navegação no mundo:** [Website Vortex![1786417722262](image/README/1786417722262.png)](https://vortex.unifor.br/about#laboratory)
