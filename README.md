@@ -12,22 +12,13 @@ Durante uma expedição nas redondezas de uma histórica capela/castelo nas mont
 
 ---
 
-## Bugs a serem corrigidos:
-
-- **Double click**: Ao clicar nos botões de movimentação, o jogador avança dois passos em vez de um.
-  - `Workaround:` Utilizar *W/A/S/D* para movimentações curtas.
-- **Movimentação invertida**: Ao virar 180°, movimentar utilizando *W/A/S/D* se torna invertido, mesmo que as setas indiquem o contrário
-  - `Workaround:` Utilizar as os *botões da UI* ou *reverter a câmera* para a posição original e assim utilizar *W/A/S/D*.
-
----
-
 ## Funcionalidades Implementadas
 
 - [X] **Visualização Panorâmica 360°:** Projeção esférica equirretangular via Shader URP e Cubemaps.
-- [X] **Navegação Dinâmica Invertida por Orientação:**
+- [X] **Navegação Dinâmica Invertida por 6 Setores Angulares (`StreetViewManager.cs`):**
   - Botões UI permanentes (`StepUpButton` e `StepBackButton`).
-  - Mapeamento angular inteligente: quando a câmera aponta para a frente (entre 270° e 90° na bússola), a seta de cima avança e a de baixo recua. Ao girar para trás (entre 90° e 270°), os comandos se invertem para acompanhar o campo de visão do jogador.
-  - Suporte secundário a teclas de atalho (WASD / Setas).
+  - Mapeamento contextual em **6 setores de visão** (2 setores de 90° para Frente e Trás; 4 setores de 45° para Diagonais) calculados dinamicamente a partir da variável `anguloCentralFrente` calibrável no Inspector.
+  - Suporte completo a **WASD e Setas**, adaptando intuitivamente qual tecla avança ou recua no mapa de acordo com o lado exato para o qual o jogador está encarando.
 - [X] **Minimapa 2D Interativo com Rastreamento em Tempo Real (`MinimapManager.cs`):**
   - Representação visual 2D da trilha/mapa no canto da tela.
   - Pino marcador do jogador (`PlayerPin`) com interpolação suave (`Vector2.Lerp`) deslocando-se entre Waypoints ancorados conforme o panorama atual.
@@ -100,11 +91,16 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 - **Navegação Invertida Dinâmica:** Refatoração do `StreetViewManager.cs` para manter botões de navegação sempre na tela e inverter o sentido de avanço/recuo caso o jogador esteja olhando para trás no cenário.
 - **Persistência de Dados entre Cenas:** Resolução do bug de reset de progresso através do uso de chaves únicas no `PlayerPrefs` (`Fragmento_X` e `UltimoPanoramaIndex`).
 
-#### **Etapa 3: Gerenciamento Global, Polimento e AnimaçõesProcedurais**
+#### **Etapa 3: Gerenciamento Global, Polimento e Animações Procedurais**
 
 - **Refatoração do Painel da Coleção (`BookPanelProgress.cs`):** Solução de bugs de sobreposição de canvas e centralização das coordenadas via `RectTransform`. Implementação da fusão visual com interpolação de cor e pulso exclusivo nas peças de fragmentos.
 - **Implementação do Minimapa 2D (`MinimapManager.cs`):** Criação da lógica de navegação em minimapa com interpolação de pino via `Vector2.Lerp`, acompanhamento do cone de visão e sistema de `offsetAnguloCone` para calibração com a arte 2D.
 - **Gerenciador de Transições Global (`SceneTransitionManager.cs`):** Componente Singleton com `DontDestroyOnLoad` responsável por controlar o `CanvasGroup` de transição e executar o `LoadSceneAsync`.
+
+#### **Etapa 4: Refatoração de Controles e Arquitetura por Setores Angulares**
+
+- **Solução de Duplicação de Clique (*Double Click*):** Limpeza e sincronização dos ouvintes de evento `onClick` em botões de UI para prevenir chamadas duplicadas nos métodos de movimentação.
+- **Mapeamento Angular em 6 Setores (`StreetViewManager.cs`):** Substituição da lógica de inversão binária por uma arquitetura de 6 setores (2 x 90° e 4 x 45°) centralizada pela variável `anguloCentralFrente`. Esse ajuste garantiu suporte fluido às teclas WASD/Setas sem falhas ou inversões indesejadas em visões diagonais.
 
 ---
 
@@ -121,7 +117,7 @@ Este projeto utilizou Inteligência Artificial Generativa (**Gemini**) como parc
 
 - **Imagem da Moema:** Unifor
 - **Foto Capela mapa (Modificado por IA):** [Capela Donaninha - Carlos Google Maps](https://www.google.com.br/maps/place/Capela+Donaninha/@-4.2296704,-38.9284619,3a,75y,90t/data=!3m8!1e2!3m6!1sCIABIhADycTjuCAVomfQGvoADrOE!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FAHRPTWnzTTeLFsi4tocQLgp8EkbWZQBUu5WV7ZiCFhGUkuID_oJF86oiynPzSsiwLl8PX491QUEHAnRIHCirJMiMD4kUc0Iv5q2NSngt205HtjNhF5bCaA3CR7rMavx7bq_7weWt-5fOnWK9NNUY%3Dw114-h86-k-no!7i4000!8i3000!4m7!3m6!1s0x7bf475380bd2abf:0x1702e5ea1948f204!8m2!3d-4.2297093!4d-38.9284039!10e5!16s%2Fg%2F11cn2md8_l?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D)
-- **Icones:** [Kenney](https://kenney.nl/assets/game-icons)
+- **Ícones:** [Kenney](https://kenney.nl/assets/game-icons)
 - **Efeitos sonoros:** [Pixabay](https://pixabay.com/pt/sound-effects/)
 
 ---
