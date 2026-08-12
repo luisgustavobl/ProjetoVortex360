@@ -1392,19 +1392,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 423467006}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1271281854}
-        m_TargetAssemblyTypeName: StreetViewManager, Assembly-CSharp
-        m_MethodName: AoClicarSetaCima
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &423467006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1916,19 +1904,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 673283872}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1271281854}
-        m_TargetAssemblyTypeName: StreetViewManager, Assembly-CSharp
-        m_MethodName: AoClicarSetaBaixo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &673283872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2974,8 +2950,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 330585546}
   stepUpButton: {fileID: 423467005}
   stepBackButton: {fileID: 673283871}
-  anguloMinimoFrente: 270
-  anguloMaximoFrente: 90
+  anguloCentralFrente: 358
   flashOverlay: {fileID: 1707229793}
   warningCanvasGroup: {fileID: 1959493842}
   fragmentosDoDiario:

@@ -23,11 +23,9 @@ public class StreetViewManager : MonoBehaviour
     public Button stepUpButton;   // Botão da Seta de Cima (Seguir)
     public Button stepBackButton; // Botão da Seta de Baixo (Recuar)
 
-    [Header("Ângulos de Visão para Orientação")]
-    [Tooltip("Ângulo Y mínimo na bússola para considerar FRENTE (-90° normalizado vira 270°)")]
-    public float anguloMinimoFrente = 270f;
-    [Tooltip("Ângulo Y máximo na bússola para considerar FRENTE (90°)")]
-    public float anguloMaximoFrente = 90f;
+    [Header("Ângulo Y de Visão para Orientação")]
+    [Tooltip("Ângulo Y da bússola que representa a FRENTE perfeita da rua/caminho (ex: 0)")]
+    public float anguloCentralFrente = 0f;
 
     [Header("Efeitos de Limite de Mapa")]
     public CanvasGroup flashOverlay;
@@ -56,6 +54,10 @@ public class StreetViewManager : MonoBehaviour
 
     private Coroutine coroutineAlerta;
     private bool olhandoParaFrente = true;
+
+    // Enum e variável para rastrear os 6 setores angulares planejados
+    private enum SetorVisao { Frente, FrenteDireita, TrasDireita, Tras, TrasEsquerda, FrenteEsquerda }
+    private SetorVisao setorAtual = SetorVisao.Frente;
 
     void Awake()
     {
@@ -91,7 +93,6 @@ public class StreetViewManager : MonoBehaviour
 
         ConfigurarEventosDeClique();
 
-        // 2. Aguarda um frame para que todos os fragmentos e managers tenham rodado o Awake/Start após a transição de cena
         StartCoroutine(InicializarFragmentosAposCarregamento());
     }
 
@@ -129,16 +130,55 @@ public class StreetViewManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-        {
-            ProximaFoto();
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-        {
-            FotoAnterior();
-        }
-
         VerificarOrientacaoCamera();
+
+        // Mapeamento idêntico ao planejamento visual de 6 setores (2 x 90° e 4 x 45°)
+        switch (setorAtual)
+        {
+            case SetorVisao.Frente:
+                // W Proxima | S Anterior
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) FotoAnterior();
+                break;
+
+            case SetorVisao.FrenteDireita:
+                // W Proxima | D Anterior | A Proxima | S Anterior
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) FotoAnterior();
+                break;
+
+            case SetorVisao.TrasDireita:
+                // W Anterior | D Anterior | A Proxima | S Proxima
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) ProximaFoto();
+                break;
+
+            case SetorVisao.Tras:
+                // W Anterior | S Proxima
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) ProximaFoto();
+                break;
+
+            case SetorVisao.TrasEsquerda:
+                // W Anterior | A Anterior | S Proxima | D Proxima
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) ProximaFoto();
+                break;
+
+            case SetorVisao.FrenteEsquerda:
+                // W Proxima | A Anterior | S Anterior | D Proxima
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) ProximaFoto();
+                else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) FotoAnterior();
+                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) ProximaFoto();
+                break;
+        }
     }
 
     private void VerificarOrientacaoCamera()
@@ -148,8 +188,42 @@ public class StreetViewManager : MonoBehaviour
         float anguloY = cameraTransform.eulerAngles.y;
         anguloY = NormalizarAngulo(anguloY);
 
-        olhandoParaFrente = ChecarAnguloNoIntervalo(anguloY, anguloMinimoFrente, anguloMaximoFrente);
+        // 1. Calcula a diferença angular direta em relação ao anguloCentralFrente do Inspector
+        float anguloRelativo = NormalizarAngulo(anguloY - anguloCentralFrente);
 
+        // 2. Classifica a câmera nos 6 setores partindo do ângulo central
+        if (anguloRelativo >= 315f || anguloRelativo < 45f)
+        {
+            setorAtual = SetorVisao.Frente; // 90°
+            olhandoParaFrente = true;
+        }
+        else if (anguloRelativo >= 45f && anguloRelativo < 90f)
+        {
+            setorAtual = SetorVisao.FrenteDireita; // 45°
+            olhandoParaFrente = true;
+        }
+        else if (anguloRelativo >= 90f && anguloRelativo < 135f)
+        {
+            setorAtual = SetorVisao.TrasDireita; // 45°
+            olhandoParaFrente = false;
+        }
+        else if (anguloRelativo >= 135f && anguloRelativo < 225f)
+        {
+            setorAtual = SetorVisao.Tras; // 90°
+            olhandoParaFrente = false;
+        }
+        else if (anguloRelativo >= 225f && anguloRelativo < 270f)
+        {
+            setorAtual = SetorVisao.TrasEsquerda; // 45°
+            olhandoParaFrente = false;
+        }
+        else // 270° ate 315°
+        {
+            setorAtual = SetorVisao.FrenteEsquerda; // 45°
+            olhandoParaFrente = true;
+        }
+
+        // 3. Interação com a porta do Castelo
         if (enterCastleButton != null)
         {
             if (indiceAtual == indicePanoramaCastelinho)
@@ -311,7 +385,6 @@ public class StreetViewManager : MonoBehaviour
 
         AtualizarVisibilidadeFragmentos();
 
-        // Atualiza o minimapa com o índice do panorama atual
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.AtualizarPosicaoMinimapa(indiceAtual);
